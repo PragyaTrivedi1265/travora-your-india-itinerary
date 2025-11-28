@@ -29,6 +29,9 @@ const Navbar = () => {
               <Link to="/history">
                 <Button variant="ghost">History</Button>
               </Link>
+              <Link to="/feedback">
+                <Button variant="ghost">Feedback</Button>
+              </Link>
               <Button variant="outline" onClick={handleLogout}>
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
