@@ -2,30 +2,49 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, MapPin, Clock, Star } from 'lucide-react';
 import Navbar from '@/components/Navbar';
-import heroImage from '@/assets/hero-india.jpg';
+import { useState, useEffect } from 'react';
+import heroTajMahal from '@/assets/hero-india.jpg';
+import heroParis from '@/assets/hero-paris.jpg';
+import heroMachuPicchu from '@/assets/hero-machu-picchu.jpg';
+import heroSantorini from '@/assets/hero-santorini.jpg';
 import foodImage from '@/assets/indian-food.jpg';
 
 const Index = () => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const heroImages = [heroTajMahal, heroParis, heroMachuPicchu, heroSantorini];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="min-h-screen">
       <Navbar />
       
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ 
-            backgroundImage: `url(${heroImage})`,
-            filter: 'brightness(0.5)',
-          }}
-        />
+        {heroImages.map((image, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ${
+              index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+            }`}
+            style={{
+              backgroundImage: `url(${image})`,
+              filter: 'brightness(0.5)',
+            }}
+          />
+        ))}
         
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-7xl font-display font-bold text-white mb-6 animate-fade-in">
             Smart Journeys Made Simple
           </h1>
           <p className="text-xl md:text-2xl text-white/90 mb-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            Plan your perfect Indian adventure with AI-powered itineraries
+            Plan your perfect adventure with AI-powered itineraries
           </p>
           <Link to="/auth">
             <Button 
@@ -96,7 +115,7 @@ const Index = () => {
                 Discover Authentic Flavors
               </h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Every itinerary includes curated food recommendations, from traditional thalis to street food delights. Experience the rich culinary heritage of India with carefully selected breakfast, lunch, and dinner suggestions.
+                Every itinerary includes curated food recommendations, from traditional local dishes to street food delights. Experience rich culinary heritage with carefully selected breakfast, lunch, and dinner suggestions.
               </p>
               <Link to="/auth">
                 <Button size="lg">
@@ -107,7 +126,7 @@ const Index = () => {
             <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
               <img 
                 src={foodImage} 
-                alt="Indian cuisine" 
+                alt="Delicious cuisine" 
                 className="rounded-lg shadow-elegant object-cover w-full h-96"
               />
             </div>
@@ -119,7 +138,7 @@ const Index = () => {
       <section className="py-20 px-4 bg-gradient-to-br from-primary to-accent text-white">
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-4xl font-display font-bold mb-6 animate-fade-in">
-            Ready to Explore India?
+            Ready to Explore the World?
           </h2>
           <p className="text-xl mb-8 opacity-90 animate-fade-in" style={{ animationDelay: '0.1s' }}>
             Join thousands of travelers who have made their journeys unforgettable with Travora

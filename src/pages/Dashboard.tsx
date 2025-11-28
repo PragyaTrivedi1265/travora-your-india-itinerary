@@ -7,10 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, Plus } from 'lucide-react';
-import { format } from 'date-fns';
+import { Plus } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import destinationsImage from '@/assets/destinations-collage.jpg';
 
@@ -22,8 +19,7 @@ const Dashboard = () => {
   const [formData, setFormData] = useState({
     title: '',
     destination: '',
-    startDate: undefined as Date | undefined,
-    endDate: undefined as Date | undefined,
+    numberOfDays: 1,
   });
 
   useEffect(() => {
@@ -38,12 +34,16 @@ const Dashboard = () => {
 
     setCreating(true);
     try {
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setDate(startDate.getDate() + formData.numberOfDays - 1);
+
       const { error } = await supabase.from('itineraries').insert({
         user_id: user.id,
         title: formData.title,
         destination: formData.destination,
-        start_date: formData.startDate?.toISOString().split('T')[0],
-        end_date: formData.endDate?.toISOString().split('T')[0],
+        start_date: startDate.toISOString().split('T')[0],
+        end_date: endDate.toISOString().split('T')[0],
       });
 
       if (error) throw error;
@@ -56,8 +56,7 @@ const Dashboard = () => {
       setFormData({
         title: '',
         destination: '',
-        startDate: undefined,
-        endDate: undefined,
+        numberOfDays: 1,
       });
       navigate('/history');
     } catch (error: any) {
@@ -112,7 +111,7 @@ const Dashboard = () => {
                       required
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      placeholder="e.g., Golden Triangle Tour"
+                      placeholder="e.g., European Adventure"
                     />
                   </div>
 
@@ -123,56 +122,22 @@ const Dashboard = () => {
                       required
                       value={formData.destination}
                       onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-                      placeholder="e.g., Rajasthan, India"
+                      placeholder="e.g., Paris, France"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Start Date</Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="w-full justify-start text-left font-normal"
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {formData.startDate ? format(formData.startDate, 'PPP') : 'Pick a date'}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                          <Calendar
-                            mode="single"
-                            selected={formData.startDate}
-                            onSelect={(date) => setFormData({ ...formData, startDate: date })}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>End Date</Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="w-full justify-start text-left font-normal"
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {formData.endDate ? format(formData.endDate, 'PPP') : 'Pick a date'}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                          <Calendar
-                            mode="single"
-                            selected={formData.endDate}
-                            onSelect={(date) => setFormData({ ...formData, endDate: date })}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="numberOfDays">Number of Days</Label>
+                    <Input
+                      id="numberOfDays"
+                      type="number"
+                      min="1"
+                      max="365"
+                      required
+                      value={formData.numberOfDays}
+                      onChange={(e) => setFormData({ ...formData, numberOfDays: parseInt(e.target.value) || 1 })}
+                      placeholder="e.g., 7"
+                    />
                   </div>
 
                   <Button type="submit" className="w-full" disabled={creating}>
@@ -185,7 +150,7 @@ const Dashboard = () => {
             <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
               <img
                 src={destinationsImage}
-                alt="Indian destinations"
+                alt="Travel destinations"
                 className="rounded-lg shadow-elegant object-cover w-full h-full"
               />
             </div>
